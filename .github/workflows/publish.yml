@@ -1,0 +1,16 @@
+name: publish
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  id-token: write   # required for OIDC on the calling job
+jobs:
+  publish:
+    permissions:
+      contents: read
+      id-token: write
+    uses: unabandoned/.github/.github/workflows/reusable-publish.yml@bd9eb6bfc5a567b272e0c6f05703a726a2655531 # v1.1.0
+    with:
+      install-for-publish: false
+    secrets: inherit

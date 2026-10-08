@@ -1,0 +1,13 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  ci:
+    permissions:
+      contents: read
+    uses: unabandoned/.github/.github/workflows/reusable-ci.yml@bd9eb6bfc5a567b272e0c6f05703a726a2655531 # v1.1.0
+    with:
+      node-versions: '[22, 24]'
+      has-build: false

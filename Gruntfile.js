@@ -8,49 +8,25 @@
 
 'use strict';
 
+// Dogfood: `npx grunt watch` re-runs the test suite on every source change.
 module.exports = function(grunt) {
   grunt.initConfig({
-    jshint: {
-      all: [
-        'Gruntfile.js',
-        'tasks/**/*.js',
-        '<%= nodeunit.tests %>'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
-    },
-    jscs: {
-      src: ['tasks/**/*.js', 'test/tasks/**/*.js'],
-      options: {
-        config: '.jscsrc'
-      }
-    },
     watch: {
       all: {
-        files: ['<%= jshint.all %>'],
-        tasks: ['jshint', 'nodeunit']
+        files: ['Gruntfile.js', 'tasks/**/*.js', 'test/*.js'],
+        tasks: ['test']
       }
-    },
-    nodeunit: {
-      tests: ['test/tasks/*_test.js']
     }
-  });
-
-  // Dynamic alias task to nodeunit. Run individual tests with: grunt test:events
-  grunt.registerTask('test', function(file) {
-    grunt.task.run('jshint');
-    grunt.task.run('jscs');
-    grunt.config('nodeunit.tests', String(grunt.config('nodeunit.tests')).replace('*', file || '*'));
-    grunt.task.run('nodeunit');
   });
 
   grunt.loadTasks('tasks');
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
-  grunt.loadNpmTasks('grunt-contrib-internal');
-  grunt.loadNpmTasks('grunt-jscs');
+  grunt.registerTask('test', 'Run the node:test suite.', function() {
+    var done = this.async();
+    grunt.util.spawn({cmd: 'npm', args: ['test'], opts: {stdio: 'inherit'}}, function(err) {
+      done(!err);
+    });
+  });
 
-  grunt.registerTask('default', ['test', 'build-contrib']);
+  grunt.registerTask('default', ['test']);
 };

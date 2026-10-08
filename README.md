@@ -1,6 +1,23 @@
-# grunt-contrib-watch v1.1.0 [![Build Status: Linux](https://travis-ci.org/gruntjs/grunt-contrib-watch.svg?branch=master)](https://travis-ci.org/gruntjs/grunt-contrib-watch) [![Build Status: Windows](https://ci.appveyor.com/api/projects/status/olyu3uhcq59avm8v/branch/master?svg=true)](https://ci.appveyor.com/project/gruntjs/grunt-contrib-watch/branch/master)
+# @unabandoned/grunt-contrib-watch [![CI](https://github.com/unabandoned/grunt-contrib-watch/actions/workflows/ci.yml/badge.svg)](https://github.com/unabandoned/grunt-contrib-watch/actions/workflows/ci.yml)
 
 > Run predefined tasks whenever watched file patterns are added, changed or deleted
+
+A maintained fork of [grunt-contrib-watch](https://github.com/gruntjs/grunt-contrib-watch),
+kept by the [`unabandoned`](https://github.com/unabandoned) org. The task name and options are
+unchanged. Differences from upstream 1.1.0:
+
+- File watching uses [chokidar](https://github.com/paulmillr/chokidar) instead of the abandoned
+  `gaze`/`globule`. Patterns are still grunt globs (matched by grunt's own `grunt.file.isMatch`,
+  in order, `!` excludes, relative to `cwd`); chokidar only watches each pattern's static base
+  directory and skips directories no pattern can reach.
+- The livereload server is a small in-tree implementation on [ws](https://github.com/websockets/ws)
+  instead of the abandoned `tiny-lr`. It speaks the same LiveReload protocol and keeps tiny-lr's
+  HTTP endpoints (`/`, `/livereload.js`, `/changed`, `/kill`) and its `port`, `host`, `key`/`cert`
+  and `livereload` options.
+- `lodash` and `async` are gone.
+- `interrupt: true` now reliably interrupts more than once (a spawned child killed by a signal no
+  longer completes the next run early).
+- Requires Node.js 22.12 or later.
 
 
 
@@ -9,8 +26,10 @@
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
-npm install grunt-contrib-watch --save-dev
+npm install grunt-contrib-watch@npm:@unabandoned/grunt-contrib-watch --save-dev
 ```
+
+Installing it under the upstream name keeps `grunt.loadNpmTasks('grunt-contrib-watch')` working.
 
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
@@ -102,7 +121,7 @@ watch: {
 Type: `Integer`  
 Default: `100`
 
-The `interval` is passed to `fs.watchFile`. Since `interval` is only used by `fs.watchFile` and this watcher also uses `fs.watch`; it is recommended to ignore this option. *Default is 100ms*.
+The `interval` is the polling interval used when polling (`mode: 'poll'`). Native file events are used otherwise, so it is recommended to ignore this option. *Default is 100ms*.
 
 #### options.event
 Type: `String|Array`  
@@ -411,11 +430,11 @@ Once installed please use the default live reload port `35729` and the browser e
 Since live reloading is used when developing, you may want to disable building for production (and are not using the browser extension). One method is to use Connect middleware to inject the script tag into your page. Try the [connect-livereload](https://github.com/intesso/connect-livereload) middleware for injecting the live reload script into your page.
 
 ##### Rolling Your Own Live Reload
-Live reloading is made easy by the library [tiny-lr](https://github.com/mklabs/tiny-lr). It is encouraged to read the documentation for `tiny-lr`. If you would like to trigger the live reload server yourself, simply POST files to the URL: `http://localhost:35729/changed`. Or if you rather roll your own live reload implementation use the following example:
+If you would like to trigger the live reload server yourself, simply POST files (`{"files": [...]}`) to the URL: `http://localhost:35729/changed`, or GET `http://localhost:35729/changed?files=a.css,b.js`. Or if you rather roll your own live reload implementation, the server this plugin uses is exposed:
 
 ```js
 // Create a live reload server instance
-var lrserver = require('tiny-lr')();
+var lrserver = require('@unabandoned/grunt-contrib-watch/tasks/lib/lrserver')();
 
 // Listen on port 35729
 lrserver.listen(35729, function(err) { console.log('LR Server Started'); });

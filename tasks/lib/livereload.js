@@ -8,8 +8,7 @@
 
 'use strict';
 
-var tinylr = require('tiny-lr');
-var _ = require('lodash');
+var createServer = require('./lrserver');
 
 // Holds the servers out of scope in case watch is reloaded
 var servers = Object.create(null);
@@ -24,7 +23,7 @@ module.exports = function(grunt) {
     } else if (typeof options === 'number') {
       options = {port: options};
     } else {
-      options = _.defaults(options, defaults);
+      options = Object.assign({}, defaults, options);
     }
 
     var host = (options.host || '*') + ':' + options.port;
@@ -32,8 +31,7 @@ module.exports = function(grunt) {
     if (servers[host]) {
       this.server = servers[host];
     } else {
-      this.server = tinylr(options);
-      this.server.server.removeAllListeners('error');
+      this.server = createServer(options);
       this.server.server.on('error', function(err) {
         if (err.code === 'EADDRINUSE') {
           grunt.fatal('Port ' + options.port + ' is already in use by another process.');
@@ -42,10 +40,7 @@ module.exports = function(grunt) {
         }
         process.exit(1);
       });
-      this.server.listen(options.port, options.host, function(err) {
-        if (err) {
-          return grunt.fatal(err);
-        }
+      this.server.listen(options.port, options.host, function() {
         grunt.log.verbose.writeln('Live reload server started on ' + host);
       });
       servers[host] = this.server;

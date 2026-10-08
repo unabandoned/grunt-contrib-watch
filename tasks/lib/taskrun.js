@@ -65,7 +65,7 @@ module.exports = function(grunt) {
       grunt.task.run(self.tasks);
       done();
     } else {
-      self.spawned = grunt.util.spawn({
+      var child = self.spawned = grunt.util.spawn({
         // Spawn with the grunt bin
         grunt: true,
         // Run from current working dir and inherit stdio from process
@@ -76,6 +76,12 @@ module.exports = function(grunt) {
         // Run grunt this process uses, append the task to be run and any cli options
         args: self.tasks.concat(self.options.cliArgs || [])
       }, function(err, res, code) {
+        // An interrupted spawn was killed by complete(), which already moved
+        // on; a child killed by a signal reports code null (not 130), so
+        // recognise it by identity rather than exit code.
+        if (self.options.interrupt === true && self.spawned !== child) {
+          return;
+        }
         self.spawnTaskFailure = (code !== 0);
         if (self.options.interrupt !== true || (code !== 130 && code !== 1)) {
           // Spawn is done

@@ -9,8 +9,6 @@
 'use strict';
 
 var path = require('path');
-var Gaze = require('gaze').Gaze;
-var _ = require('lodash');
 var waiting = 'Waiting...';
 var changedFiles = Object.create(null);
 var watchers = [];
@@ -18,6 +16,7 @@ var watchers = [];
 module.exports = function(grunt) {
 
   var taskrun = require('./lib/taskrunner')(grunt);
+  var Gaze = require('./lib/watcher')(grunt);
 
   // Default date format logged
   var dateFormat = function(time) {
@@ -91,9 +90,9 @@ module.exports = function(grunt) {
       }
 
       // Process into raw patterns
-      var patterns = _.chain(target.files).flatten().map(function(pattern) {
+      var patterns = target.files.flat().map(function(pattern) {
         return grunt.config.process(pattern);
-      }).value();
+      });
 
       // Validate the event option
       if (typeof target.options.event === 'string') {
@@ -135,8 +134,8 @@ module.exports = function(grunt) {
         this.on('all', function(status, filepath) {
 
           // Skip events not specified
-          if (!_.includes(target.options.event, 'all') &&
-              !_.includes(target.options.event, status)) {
+          if (target.options.event.indexOf('all') === -1 &&
+              target.options.event.indexOf(status) === -1) {
             return;
           }
 
