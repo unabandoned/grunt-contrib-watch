@@ -43,6 +43,7 @@
     "provenance": true
   },
   "files": [
-    "tasks"
+    "tasks",
+    "LICENSE-MIT"
   ]
 }
