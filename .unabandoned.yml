@@ -1,0 +1,31 @@
+schema: 1
+
+package: "@unabandoned/grunt-contrib-watch"
+
+upstream:
+  repo: gruntjs/grunt-contrib-watch
+  reason: "no release since 1.1.0 in May 2018, still on gaze, tiny-lr, async 2 and lodash"
+
+summary: >-
+  Grunt task that re-runs configured tasks whenever watched file patterns are
+  added, changed or deleted, with an optional LiveReload server.
+
+why-forked: >-
+  CyberChef runs it in its dev server, and upstream has been frozen since 2018
+  on a rotting tree: gaze and globule (abandoned file watching), tiny-lr
+  (abandoned, pulling faye-websocket, body, debug, qs and an old
+  livereload-js) and async 2. The fork watches with chokidar, matches patterns
+  with grunt's own matcher, replaces tiny-lr with a small in-tree LiveReload
+  server on ws, and drops async and lodash.
+
+used-by:
+  - consumer: TheTechNetwork/CyberChef
+    purpose: >-
+      `grunt dev` runs watch:config (through grunt-concurrent) to regenerate
+      the operation config and Node index (exec:generateNodeIndex,
+      exec:generateConfig) whenever a file under src/core/operations changes,
+      excluding the generated src/core/operations/index.mjs
+
+status: active
+
+tags: [grunt, gruntplugin, watch, livereload]

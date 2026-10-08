@@ -11,8 +11,6 @@
 var path = require('path');
 var EE = require('events').EventEmitter;
 var util = require('util');
-var _ = require('lodash');
-var async = require('async');
 
 // Track which targets to run after reload
 var reloadTargets = [];
@@ -153,13 +151,33 @@ module.exports = function(grunt) {
     return targets;
   };
 
+  // Like lodash's _.defaults: fill properties of the first object that are
+  // undefined from each following source, in order. Mutates and returns it.
+  function defaults(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      if (source == null) {
+        continue;
+      }
+      for (var key in source) {
+        if (target[key] === undefined) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  }
+
   // Default options
   Runner.prototype._options = function _options() {
+    var cliTasks = grunt.cli.tasks || [];
     var args = Array.prototype.slice.call(arguments).concat({
       // The cwd to spawn within
       cwd: process.cwd(),
       // Additional cli args to append when spawning
-      cliArgs: _.without.apply(null, [[].slice.call(process.argv, 2)].concat(grunt.cli.tasks)),
+      cliArgs: process.argv.slice(2).filter(function(arg) {
+        return cliTasks.indexOf(arg) === -1;
+      }),
       interrupt: false,
       nospawn: false,
       spawn: true,
@@ -167,11 +185,24 @@ module.exports = function(grunt) {
       event: ['all'],
       target: null
     });
-    return _.defaults.apply(_, args);
+    return defaults.apply(null, args);
   };
 
-  // Run the current queue of task runs
-  Runner.prototype.run = _.debounce(function run() {
+  // Run the current queue of task runs, debounced (trailing, 250ms) so a burst
+  // of file events becomes a single run.
+  var runTimer = null;
+  Runner.prototype.run = function run() {
+    var self = this;
+    if (runTimer) {
+      clearTimeout(runTimer);
+    }
+    runTimer = setTimeout(function() {
+      runTimer = null;
+      self._run();
+    }, 250);
+  };
+
+  Runner.prototype._run = function _run() {
     var self = this;
     if (self.queue.length < 1) {
       self.running = false;
@@ -210,7 +241,21 @@ module.exports = function(grunt) {
 
     // Run each target
     var shouldComplete = true;
-    async.forEachSeries(self.queue, function(name, next) {
+    var queue = self.queue.slice();
+    var index = 0;
+    function finish() {
+      if (shouldComplete) {
+        self.complete();
+      } else {
+        grunt.task.mark().run(self.nameArgs);
+        self.done();
+      }
+    }
+    function next() {
+      if (index >= queue.length) {
+        return finish();
+      }
+      var name = queue[index++];
       var tr = self.targets[name];
       if (!tr) {
         return next();
@@ -223,15 +268,9 @@ module.exports = function(grunt) {
         shouldComplete = false;
       }
       tr.run(next);
-    }, function() {
-      if (shouldComplete) {
-        self.complete();
-      } else {
-        grunt.task.mark().run(self.nameArgs);
-        self.done();
-      }
-    });
-  }, 250);
+    }
+    next();
+  };
 
   // Push targets onto the queue
   Runner.prototype.add = function add(target) {

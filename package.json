@@ -1,42 +1,49 @@
 {
-  "name": "grunt-contrib-watch",
+  "name": "@unabandoned/grunt-contrib-watch",
   "description": "Run predefined tasks whenever watched file patterns are added, changed or deleted",
   "version": "1.1.0",
   "author": {
     "name": "Grunt Team",
     "url": "http://gruntjs.com/"
   },
-  "repository": "gruntjs/grunt-contrib-watch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unabandoned/grunt-contrib-watch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unabandoned/grunt-contrib-watch/issues"
+  },
+  "homepage": "https://github.com/unabandoned/grunt-contrib-watch#readme",
   "license": "MIT",
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=22.12"
   },
   "main": "tasks/watch.js",
   "scripts": {
-    "test": "grunt test -v"
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
-    "async": "^2.6.0",
-    "gaze": "^1.1.0",
-    "lodash": "^4.17.10",
-    "tiny-lr": "^1.1.1"
+    "chokidar": "^5.0.0",
+    "livereload-js": "^4.0.2",
+    "ws": "^8.22.0"
   },
   "devDependencies": {
-    "grunt": "^1.0.2",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-internal": "^2.0.0",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-nodeunit": "^1.0.0",
-    "grunt-jscs": "^3.0.0",
-    "underscore.string": "^3.2.2"
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "grunt": "1.6.3"
   },
   "keywords": [
     "gruntplugin",
     "watch",
     "livereload"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "files": [
-    "tasks"
-  ],
-  "appveyor_id": "olyu3uhcq59avm8v"
+    "tasks",
+    "LICENSE-MIT"
+  ]
 }
