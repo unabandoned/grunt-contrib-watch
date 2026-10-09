@@ -12,4 +12,4 @@ jobs:
   renovate-config:
     permissions:
       contents: read
-    uses: unabandoned/.github/.github/workflows/reusable-renovate-config.yml@bd9eb6bfc5a567b272e0c6f05703a726a2655531 # v1.1.0
+    uses: unabandoned/.github/.github/workflows/reusable-renovate-config.yml@f3a51c77d39497de31ac09c4eb3f2ab8956dfbf4 # v1.3.0
