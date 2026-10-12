@@ -7,5 +7,5 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: unabandoned/.github/.github/workflows/reusable-release-please.yml@f3a51c77d39497de31ac09c4eb3f2ab8956dfbf4 # v1.3.0
+    uses: unabandoned/.github/.github/workflows/reusable-release-please.yml@21b556478d51be2e553cb1bf790b54b1812e3fce # v1.3.1
     secrets: inherit
