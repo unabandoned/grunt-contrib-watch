@@ -16,7 +16,7 @@
   "homepage": "https://github.com/unabandoned/grunt-contrib-watch#readme",
   "license": "MIT",
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "main": "tasks/watch.js",
   "scripts": {
