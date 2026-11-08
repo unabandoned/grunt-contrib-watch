@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/unabandoned/grunt-contrib-watch/compare/grunt-contrib-watch-v1.2.0...grunt-contrib-watch-v1.2.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency chokidar to v6 ([#10](https://github.com/unabandoned/grunt-contrib-watch/issues/10)) ([9e1d097](https://github.com/unabandoned/grunt-contrib-watch/commit/9e1d09747584479b47d7052591229a025c695c39))
+
 ## [1.2.0](https://github.com/unabandoned/grunt-contrib-watch/compare/grunt-contrib-watch-v1.1.0...grunt-contrib-watch-v1.2.0) (2026-10-08)
 
 
