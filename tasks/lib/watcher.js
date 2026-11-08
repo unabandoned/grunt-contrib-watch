@@ -29,7 +29,8 @@ var util = require('util');
 
 var chokidar = null;
 function loadChokidar() {
-  // chokidar is ESM-only; Node >= 22.12 can require() it synchronously.
+  // chokidar is ESM-only; Node >= 22.12 can require() it synchronously
+  // (chokidar 6 itself needs >= 22.22).
   if (!chokidar) {
     chokidar = require('chokidar');
   }
@@ -128,9 +129,9 @@ module.exports = function(grunt) {
     self._watcher = loadChokidar().watch(roots, {
       ignoreInitial: true,
       persistent: true,
-      usePolling: usePolling,
-      interval: typeof options.interval === 'number' ? options.interval : 100,
-      binaryInterval: typeof options.interval === 'number' ? options.interval : 300,
+      backend: usePolling ? 'polling' : 'auto',
+      pollingInterval: typeof options.interval === 'number' ? options.interval : 100,
+      pollingBinaryInterval: typeof options.interval === 'number' ? options.interval : 300,
       ignored: function(filepath) {
         return !self._couldMatch(filepath);
       }
